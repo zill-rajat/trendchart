@@ -1,0 +1,10 @@
+{
+  "id": "PLUG_0a1ad759-7ca8-4bd8-a788-b70b96663939",
+  "type": "reporting_widget",
+  "version": "1.0.0",
+  "defaultLanguage": "EN",
+  "metadata": {},
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema"
+  }
+}

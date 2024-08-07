@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "summary": "Extension Language Strings - EN"
+  },
+  "strings": {
+    "name": {
+      "text": "trendchart",
+      "context": "The Extension Name"
+    },
+    "description": {
+      "text": "Extension Description",
+      "context": "Displayed when listing the extension"
+    },
+    "longDescription": {
+      "text": "Extension Long Description",
+      "context": "This long textual description is displayed when a user clicks on an extension"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "summary": "App Plugin Language Strings - EN"
+  },
+  "strings": {
+    "name": {
+      "text": "trendchart",
+      "context": "Plugin name"
+    },
+    "description": {
+      "text": "default Description",
+      "context": "Displayed when listing plugin"
+    },
+    "longDescription": {
+      "text": "$name% Long Description",
+      "context": "This long textual description is displayed when a user clicks for more details on plugin"
+    },
+    "configurationPanel.metric": {
+      "text": "Metric"
+    },
+    "configurationPanel.dimension": {
+      "text": "Dimension"
+    },
+    "configurationPanel.selectAField": {
+      "text": "Select a field"
+    }
+  }
+}

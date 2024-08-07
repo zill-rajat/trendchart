@@ -1,0 +1,9 @@
+# Add patterns to this file to prevent files and/or directories from being included in your extension package
+
+# This will ignore any files or directories called "node_modules" in your extension
+node_modules
+
+# This will ignore any package files created by using "xmt package extension"
+packages
+
+.git

@@ -1,0 +1,52 @@
+/* Table.css */
+.table-container {
+    font-family: Arial, sans-serif;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    text-align: left;
+}
+
+/* Table header style */
+.table th {
+    background-color: #dee2e6;
+    /* Complementary to td background */
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    /* Text color */
+    font-weight: bold;
+}
+
+/* Table cell style */
+.table td {
+    border-bottom: 1px solid #dee2e6;
+    color: #495057;
+    /* Text color */
+}
+
+.table .even-row {
+    background-color: #f2f2f2;
+}
+
+.table .odd-row {
+    background-color: #ffffff;
+}
+
+/* Faded row */
+.table tr {
+    transition: opacity 0.3s ease;
+    /* Smooth transition for fading effect */
+}
+
+/* Fade out row only on hover */
+.table tr:hover {
+    opacity: 0.8;
+    /* Adjust opacity to control fading effect */
+}

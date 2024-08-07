@@ -1,0 +1,5 @@
+.vscode
+node_modules
+public/js/*
+public/*.html
+package-lock.json
