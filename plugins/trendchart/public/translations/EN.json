@@ -8,7 +8,7 @@
       "context": "Plugin name"
     },
     "description": {
-      "text": "default Description",
+      "text": "Analyse the trends in a chart",
       "context": "Displayed when listing plugin"
     },
     "longDescription": {
