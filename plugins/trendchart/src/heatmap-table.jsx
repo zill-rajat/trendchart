@@ -12,7 +12,8 @@ const Table = ({ shapeData }) => {
 
   const convertToPercent = ["top2Box", "topBox"].includes(metric);
 
-  const data = useMemo(() => getData(shapeData.data, period), [shapeData.data, period]);
+  // Get data only for the current year and add average of last year as first column
+  const data = useMemo(() => getDataWithCurrentYearAndLastYearAverage(shapeData.data, period), [shapeData.data, period]);
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -82,16 +83,12 @@ const Table = ({ shapeData }) => {
             return (
               <tr {...row.getRowProps()} className={i % 2 === 0 ? "even-row" : "odd-row"}>
                 {row.cells.map((cell, j) => {
-                  // Ensure that numeric operations are only applied to numeric columns (skip first column)
                   const isNumericColumn = j > 0;
-
                   const backgroundColor = j === 0
-                    ? "#ffffff" // First column background color
-                    : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex(); // Calculate difference with previous cell value
+                    ? "#ffffff" 
+                    : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex(); 
 
-                  // Adjust font color based on background color brightness
                   const fontColor = chroma(backgroundColor).luminance() < 0.5 ? '#ffffff' : '#000000';
-                  // Calculate change from previous cell value
                   const previousValue = j > 0 ? row.cells[j - 1].value : null;
                   const change = previousValue !== null && isNumericColumn ? (cell.value - previousValue).toFixed(2) : null;
 
@@ -100,18 +97,17 @@ const Table = ({ shapeData }) => {
                       {...cell.getCellProps()}
                       style={{
                         background: backgroundColor,
-                        color: fontColor, // Set font color based on brightness
+                        color: fontColor,
                         whiteSpace: j === 0 ? 'nowrap' : 'normal',
                         overflow: j === 0 ? 'hidden' : 'visible',
                         textOverflow: j === 0 ? 'ellipsis' : 'clip',
                         maxWidth: j === 0 ? '250px' : 'auto',
                         cursor: j === 0 ? 'pointer' : 'default',
-                        textAlign: 'center', // Center text in the cell
-                        verticalAlign: 'middle' // Vertically center text
+                        textAlign: 'center',
+                        verticalAlign: 'middle'
                       }}
-                      title={j === 0 ? cell.value : undefined} // Tooltip on hover for the first column
+                      title={j === 0 ? cell.value : undefined}
                     >
-                      {/* First column doesn't apply percentage conversion or display changes */}
                       {j === 0 ? cell.value : (
                         <>
                           {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) : cell.value}
@@ -198,21 +194,41 @@ function formatDate(date, period) {
   }
 }
 
-const getData = (data, period) => {
-  const dates = data[0].children.map(child => {
-    const date = new Date(child.id);
-    return formatDate(date, period);
-  });
+// Function to get data only for current year and add last year's average
+const getDataWithCurrentYearAndLastYearAverage = (data, period) => {
+  const currentYear = new Date().getFullYear();
+  const lastYear = currentYear - 1;
+
+  // Map dates for current year
+  const datesForCurrentYear = data[0].children
+    .map(child => new Date(child.id))
+    .filter(date => date.getFullYear() === currentYear)
+    .map(date => formatDate(date, period));
+
+  // Map dates for last year
+  const datesForLastYear = data[0].children
+    .map(child => new Date(child.id))
+    .filter(date => date.getFullYear() === lastYear);
 
   return data.map(hospital => {
     const rowData = { Field: hospital.id };
-    dates.forEach(date => {
-      const child = hospital.children.find(item => {
-        const itemDate = new Date(item.id);
-        return formatDate(itemDate, period) === date;
-      });
+
+    // Calculate average for last year
+    const lastYearValues = datesForLastYear.map(date => {
+      const child = hospital.children.find(item => new Date(item.id).getTime() === date.getTime());
+      return child ? parseFloat(child.value) : null;
+    }).filter(val => val !== null);
+
+    rowData['Avg Last Year'] = lastYearValues.length > 0
+      ? (lastYearValues.reduce((acc, val) => acc + val, 0) / lastYearValues.length).toFixed(2)
+      : null;
+
+    // Populate current year data
+    datesForCurrentYear.forEach(date => {
+      const child = hospital.children.find(item => formatDate(new Date(item.id), period) === date);
       rowData[date] = child ? parseFloat(child.value) : null;
     });
+
     return rowData;
   });
 };
