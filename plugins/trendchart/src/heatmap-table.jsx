@@ -25,7 +25,7 @@ const Table = ({ shapeData }) => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
-  const convertDecimalToPercentageWithinCell = value => isNaN(value) ? value : `${Math.round(value * 100)}%`;
+  const convertDecimalToPercentageWithinCell = value => isNaN(value) ? '-' : `${Math.round(value * 100)}%`;
 
   const [improvements, setImprovements] = useState({
     biggestImprovement: {},
@@ -90,7 +90,7 @@ const Table = ({ shapeData }) => {
 
                   const fontColor = chroma(backgroundColor).luminance() < 0.5 ? '#ffffff' : '#000000';
                   const previousValue = j > 0 ? row.cells[j - 1].value : null;
-                  const change = previousValue !== null && isNumericColumn ? (cell.value - previousValue).toFixed(2) : null;
+                  const change = previousValue !== null && isNumericColumn ? (cell.value - previousValue) : "-";
 
                   return (
                     <td
@@ -108,12 +108,12 @@ const Table = ({ shapeData }) => {
                       }}
                       title={j === 0 ? cell.value : undefined}
                     >
-                      {j === 0 ? cell.value : (
+                      {j === 0 ? (cell.value) : (
                         <>
-                          {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) : cell.value}
-                          {change !== null && change != NaN && isNumericColumn && change !== "NaN" && (
+                          {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) === 'NaN'? '-': convertDecimalToPercentageWithinCell(cell.value) : cell.value}
+                          {(
                             <span style={{ fontSize: '0.8em', marginLeft: '5px' }}>
-                              ({change})
+                              {!isNaN(change) ? `(${(change * 100).toFixed(2)}%)` : ''}
                             </span>
                           )}
                         </>
