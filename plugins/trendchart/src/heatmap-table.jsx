@@ -81,24 +81,56 @@ const Table = ({ shapeData }) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()} className={i % 2 === 0 ? "even-row" : "odd-row"}>
-                {row.cells.map((cell, j) => (
-                  <td
-                    {...cell.getCellProps()}
-                    style={{
-                      background: j === 0
-                        ? "#ffffff" // First column background color
-                        : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex() // Calculate difference with previous cell value
-                    }}
-                  >
-                    {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) : cell.value}
-                  </td>
-                ))}
+                {row.cells.map((cell, j) => {
+                  // Ensure that numeric operations are only applied to numeric columns (skip first column)
+                  const isNumericColumn = j > 0;
+
+                  const backgroundColor = j === 0
+                    ? "#ffffff" // First column background color
+                    : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex(); // Calculate difference with previous cell value
+
+                  // Adjust font color based on background color brightness
+                  const fontColor = chroma(backgroundColor).luminance() < 0.5 ? '#ffffff' : '#000000';
+                  // Calculate change from previous cell value
+                  const previousValue = j > 0 ? row.cells[j - 1].value : null;
+                  const change = previousValue !== null && isNumericColumn ? (cell.value - previousValue).toFixed(2) : null;
+
+                  return (
+                    <td
+                      {...cell.getCellProps()}
+                      style={{
+                        background: backgroundColor,
+                        color: fontColor, // Set font color based on brightness
+                        whiteSpace: j === 0 ? 'nowrap' : 'normal',
+                        overflow: j === 0 ? 'hidden' : 'visible',
+                        textOverflow: j === 0 ? 'ellipsis' : 'clip',
+                        maxWidth: j === 0 ? '250px' : 'auto',
+                        cursor: j === 0 ? 'pointer' : 'default',
+                        textAlign: 'center', // Center text in the cell
+                        verticalAlign: 'middle' // Vertically center text
+                      }}
+                      title={j === 0 ? cell.value : undefined} // Tooltip on hover for the first column
+                    >
+                      {/* First column doesn't apply percentage conversion or display changes */}
+                      {j === 0 ? cell.value : (
+                        <>
+                          {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) : cell.value}
+                          {change !== null && change != NaN && isNumericColumn && change !== "NaN" && (
+                            <span style={{ fontSize: '0.8em', marginLeft: '5px' }}>
+                              ({change})
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
           <tr>
             <td colSpan={columns.length} style={headlineStyle}>
-              <strong style={headlineTitleStyle}>Headlines:</strong>
+              <strong style={headlineTitleStyle}>Headlines (latest month vs last month):</strong>
               <ul style={headlineListStyle}>
                 <li style={headlineItemStyle}>
                   <strong>Biggest Improvement:</strong>{" "}
@@ -150,7 +182,7 @@ function formatDate(date, period) {
   }
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const year = date.getFullYear();
+  const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
   const month = date.getMonth(); // 0-indexed, so Jan is 0 and Dec is 11
 
   switch (period) {
