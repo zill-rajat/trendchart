@@ -50,3 +50,25 @@
     opacity: 0.8;
     /* Adjust opacity to control fading effect */
 }
+
+.download-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px; /* Padding for button */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #f2f2f2; /* Primary color */
+    font-size: 14px; /* Font size */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Transition for hover effect */
+    margin-bottom: 10px;
+}
+
+.download-button:hover {
+    background-color: #dee2e6; /* Darker shade for hover */
+}
+
+.download-button img {
+    height: 20px; /* Image height */
+    width: 20px; /* Image width */
+}

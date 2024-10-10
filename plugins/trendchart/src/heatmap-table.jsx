@@ -1,6 +1,8 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { useTable } from "react-table";
 import chroma from "chroma-js";
+import domtoimage from 'dom-to-image';
+
 import "./heatmap-table.css"; // Import the CSS file
 
 const Table = ({ shapeData }) => {
@@ -26,6 +28,21 @@ const Table = ({ shapeData }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
   const convertDecimalToPercentageWithinCell = value => isNaN(value) ? '-' : `${Math.round(value * 100)}%`;
+
+  const downloadTableAsPNG = () => {
+    const table = document.getElementById('table-to-download'); // Get the table element
+
+    domtoimage.toPng(table)
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.href = dataUrl; // Set the data URL for the image
+        link.download = 'table.png'; // Set the download filename
+        link.click(); // Trigger the download
+      })
+      .catch((error) => {
+        console.error('Error generating image: ', error);
+      });
+  };
 
   const [improvements, setImprovements] = useState({
     biggestImprovement: {},
@@ -67,7 +84,10 @@ const Table = ({ shapeData }) => {
 
   return (
     <div className="table-container">
-      <table {...getTableProps()} className="table">
+      <button onClick={downloadTableAsPNG} className="download-button">
+        <img src="https://cdn.icon-icons.com/icons2/2348/PNG/512/download_icon_143099.png" alt="Download" />
+      </button>
+      <table id="table-to-download" {...getTableProps()} className="table">
         <thead>
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -85,8 +105,8 @@ const Table = ({ shapeData }) => {
                 {row.cells.map((cell, j) => {
                   const isNumericColumn = j > 0;
                   const backgroundColor = j === 0
-                    ? "#ffffff" 
-                    : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex(); 
+                    ? "#ffffff"
+                    : chromaScale((cell.value - row.cells[j - 1].value) * 100).hex();
 
                   const fontColor = chroma(backgroundColor).luminance() < 0.5 ? '#ffffff' : '#000000';
                   const previousValue = j > 0 ? row.cells[j - 1].value : null;
@@ -110,7 +130,7 @@ const Table = ({ shapeData }) => {
                     >
                       {j === 0 ? (cell.value) : (
                         <>
-                          {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) === 'NaN'? '-': convertDecimalToPercentageWithinCell(cell.value) : cell.value}
+                          {convertToPercent ? convertDecimalToPercentageWithinCell(cell.value) === 'NaN' ? '-' : convertDecimalToPercentageWithinCell(cell.value) : cell.value}
                           {(
                             <span style={{ fontSize: '0.8em', marginLeft: '5px' }}>
                               {!isNaN(change) ? `(${(change * 100).toFixed(2)}%)` : ''}
